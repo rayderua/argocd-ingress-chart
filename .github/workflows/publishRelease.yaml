@@ -1,0 +1,63 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.14.0
+
+      - name: Package Helm chart
+        run: |          
+          VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          helm package . --version $VERSION --destination ./charts
+
+      - name: Update Helm repo index
+        run: |
+          helm repo index ./charts --url https://rayderua.github.io/argocd-ingress-chart/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./charts
+          publish_branch: gh-pages
+
+      - name: Set version from tag
+        id: vars
+        run: |
+          TAG_VERSION=${GITHUB_REF##*/}
+          echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          body: |
+            Release for ${{ env.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload chart to GitHub Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./charts/argocd-ingress-${{ env.VERSION }}.tgz
+          asset_name: argocd-ingress-${{ env.VERSION }}.tgz
+          asset_content_type: application/gzip
