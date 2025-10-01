@@ -1,0 +1,81 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.14.0
+
+      - name: Set env vars
+        id: vars
+        run: |
+          TAG_VERSION=${GITHUB_REF##*/}
+          echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
+          CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV          
+
+      - name: Prepare gh-pages
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git clone --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/rayderua/argocd-ingress-chart.git gh-pages
+
+      - name: Package Helm chart
+        run: |
+          CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV          
+          helm package . --version $CHART_VERSION --destination ./gh-pages
+
+      - name: Update Helm index
+        run: |
+          if [ -f ./gh-pages/index.yaml ]; then          
+            helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/ --merge ./gh-pages/index.yaml
+          else
+            helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/
+          fi
+
+
+      - name: Push to gh-pages
+        run: |
+          cd gh-pages
+          git add .
+          git commit -m "Release chart ${{ env.CHART_VERSION }}"
+          git push origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          body: |
+            Release for ${{ env.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload chart to GitHub Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./gh-pages/argocd-ingress-${{ env.CHART_VERSION }}.tgz
+          asset_name: argocd-ingress-${{ env.CHART_VERSION }}.tgz
+          asset_content_type: application/gzip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
