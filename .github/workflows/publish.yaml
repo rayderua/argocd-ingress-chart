@@ -5,10 +5,6 @@ on:
     tags:
       - 'v*'  # реагирует на все теги вида vX.Y.Z или vX.Y.Z-rc1
 
-permissions:
-  contents: read
-
-
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
