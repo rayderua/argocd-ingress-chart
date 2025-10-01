@@ -19,32 +19,42 @@ jobs:
         with:
           version: v3.14.0
 
-      - name: Package Helm chart
-        run: |          
-          CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
-          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV
-          helm package . --version $CHART_VERSION --destination ./charts
-
-      - name: Update Helm repo index
-        run: |
-          if [ -f ./charts/index.yaml ]; then
-            helm repo index ./charts --url https://rayderua.github.io/argocd-ingress-chart/ --merge ./charts/index.yaml
-          else
-            helm repo index ./charts --url https://rayderua.github.io/argocd-ingress-chart/
-          fi
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./charts
-          publish_branch: gh-pages
-
-      - name: Set version from tag
+      - name: Set env vars
         id: vars
         run: |
           TAG_VERSION=${GITHUB_REF##*/}
           echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
+          CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV          
+
+      - name: Prepare gh-pages
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git clone --branch gh-pages https://github.com/rayderua/argocd-ingress-chart.git gh-pages
+
+      - name: Package Helm chart
+        run: |          
+          CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV          
+          helm package . --version $CHART_VERSION --destination ./gh-pages
+
+      - name: Update Helm index
+        run: |
+          if [ -f ./gh-pages/index.yaml ]; then          
+            helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/ --merge ./gh-pages/index.yaml
+          else
+            helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/
+          fi
+
+      - name: Push to gh-pages
+        run: |
+          cd gh-pages
+          git add .
+          git commit -m "Release chart ${{ env.CHART_VERSION }}"
+          git push origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         id: create_release
@@ -63,7 +73,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./charts/argocd-ingress-${{ env.CHART_VERSION }}.tgz
+          asset_path: ./gh-pages/argocd-ingress-${{ env.CHART_VERSION }}.tgz
           asset_name: argocd-ingress-${{ env.CHART_VERSION }}.tgz
           asset_content_type: application/gzip
         env:
