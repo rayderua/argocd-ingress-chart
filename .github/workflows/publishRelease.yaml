@@ -19,6 +19,9 @@ jobs:
         with:
           version: v3.14.0
 
+      - name: Fetch current Chart Index
+        run: |
+          git checkout origin/gh-pages index.yaml
       - name: Package Helm chart
         run: |          
           CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
@@ -27,7 +30,11 @@ jobs:
 
       - name: Update Helm repo index
         run: |
-          helm repo index ./charts --url https://rayderua.github.io/argocd-ingress-chart/
+          if [ -f ./charts/index.yaml ]; then
+            helm repo index ./charts --url https://rayderua.github.io/argocd-ingress-chart/ --merge ./charts/index.yaml
+          else
+            helm repo index ./charts --url https://rayderua.github.io/argocd-ingress-chart/
+          fi
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
