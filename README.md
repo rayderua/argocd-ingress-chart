@@ -8,3 +8,10 @@ It simplifies installation by removing all non-essential components while preser
 - 🚀 Deploys only Ingress resources for ArgoCD
 - 🧩 Simplified chart based on the official ArgoCD Helm chart
 - ⚙️ Default `fullnameOverride` is set to **`argocd`**, matching the default service name in the official chart
+
+## Installation
+```bash
+helm repo add argocd-ingress https://rayderua.github.io/argocd-ingress-chart
+helm repo update
+helm install argocd-ingress argocd-ingress/argocd-ingress
+```
