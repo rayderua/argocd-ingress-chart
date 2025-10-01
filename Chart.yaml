@@ -1,0 +1,20 @@
+annotations: {}
+apiVersion: v2
+appVersion: v3.1.4
+dependencies: []
+description: A Helm chart for setup Argo CD Ingresses only. This chart is a shortened version of the original argo-cd
+home: https://github.com/argoproj/argo-helm
+icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
+keywords:
+  - argoproj
+  - argocd
+  - gitops
+kubeVersion: '>=1.25.0-0'
+maintainers:
+  - name: rayderua
+    url: https://argoproj.github.io/
+name: argocd-ingress
+sources:
+  - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+  - https://github.com/argoproj/argo-cd
+version: 8.3.5
