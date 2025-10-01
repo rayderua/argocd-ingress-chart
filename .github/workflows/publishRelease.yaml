@@ -31,7 +31,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git clone --branch gh-pages https://github.com/rayderua/argocd-ingress-chart.git gh-pages
+          git clone --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/rayderua/argocd-ingress-chart.git gh-pages
 
       - name: Package Helm chart
         run: |          
@@ -47,11 +47,10 @@ jobs:
             helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/
           fi
 
+
       - name: Push to gh-pages
         run: |
           cd gh-pages
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
           git add .
           git commit -m "Release chart ${{ env.CHART_VERSION }}"
           git push origin gh-pages
