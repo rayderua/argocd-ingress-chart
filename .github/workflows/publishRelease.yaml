@@ -62,3 +62,5 @@ jobs:
           asset_path: ./charts/argocd-ingress-${{ env.CHART_VERSION }}.tgz
           asset_name: argocd-ingress-${{ env.CHART_VERSION }}.tgz
           asset_content_type: application/gzip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
