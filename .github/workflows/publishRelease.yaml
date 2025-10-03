@@ -44,7 +44,7 @@ jobs:
           if [ -f ./gh-pages/index.yaml ]; then          
             helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/ --merge ./gh-pages/index.yaml
           else
-            helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/
+              helm repo index ./gh-pages --url https://rayderua.github.io/argocd-ingress-chart/
           fi
 
 

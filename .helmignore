@@ -2,3 +2,5 @@
 output
 ci/
 *.gotmpl
+.git/
+gh-pages/
