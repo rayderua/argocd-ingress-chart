@@ -3,7 +3,32 @@ entries:
   argocd-ingress:
   - apiVersion: v2
     appVersion: v3.1.4
-    created: "2025-10-01T17:45:03.984089992Z"
+    created: "2025-10-03T15:05:30.951408691Z"
+    description: A Helm chart for setup Argo CD Ingresses only. This chart is a shortened
+      version of the original argo-cd
+    digest: 588df920e5f5b6e15e45e34bf779bfb36d30de52f05814baab127c568b506dc1
+    home: https://github.com/rayderua/argocd-ingress-chart
+    icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
+    keywords:
+    - argoproj
+    - argocd
+    - gitops
+    - ingress
+    kubeVersion: '>=1.25.0-0'
+    maintainers:
+    - name: rayderua
+      url: https://rayderua.github.io/
+    name: argocd-ingress
+    sources:
+    - https://github.com/rayderua/argocd-ingress-chart/tree/main
+    - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+    - https://github.com/argoproj/argo-cd
+    urls:
+    - https://rayderua.github.io/argocd-ingress-chart/argocd-ingress-v8.3.6.tgz
+    version: v8.3.6
+  - apiVersion: v2
+    appVersion: v3.1.4
+    created: "2025-10-03T15:05:30.923845505Z"
     description: A Helm chart for setup Argo CD Ingresses only. This chart is a shortened
       version of the original argo-cd
     digest: 27569be8823c95c2f5cbb3661e30660cf9dd6210b7e0eb89ca2b550b3e5deeb7
@@ -26,4 +51,4 @@ entries:
     urls:
     - https://rayderua.github.io/argocd-ingress-chart/argocd-ingress-v8.3.5.tgz
     version: v8.3.5
-generated: "2025-10-01T17:45:03.96733059Z"
+generated: "2025-10-03T15:05:30.909584199Z"
