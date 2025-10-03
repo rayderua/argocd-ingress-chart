@@ -1,6 +1,6 @@
 annotations: {}
 apiVersion: v2
-appVersion: v3.1.4
+appVersion: v3.1.5
 dependencies: []
 description: A Helm chart for setup Argo CD Ingresses only. This chart is a shortened version of the original argo-cd
 home: https://github.com/rayderua/argocd-ingress-chart
