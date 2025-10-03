@@ -19,4 +19,4 @@ sources:
   - https://github.com/rayderua/argocd-ingress-chart/tree/main
   - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
   - https://github.com/argoproj/argo-cd
-version: v8.5.0
+version: v8.5.1
